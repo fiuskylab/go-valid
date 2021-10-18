@@ -3,7 +3,10 @@ package validator
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
+
+	r "github.com/fiuskylab/go-valid/validator/rules"
 )
 
 type validator struct {
@@ -44,11 +47,33 @@ func (v *validator) validateField(value interface{}, fieldName string, rules []s
 	var err error
 
 	for _, rule := range rules {
-		switch rule {
-		case "required":
-			if res := required(value); res != "" {
+		if rule == "required" {
+			if res := r.Required(value); res != "" {
 				results = append(results, res)
 			}
+			continue
+		}
+		if strings.HasPrefix("max:", rule) {
+			maxStrValue := rule[4:]
+			maxIntValue, err := strconv.Atoi(maxStrValue)
+			if err != nil {
+				break
+			}
+			if res := r.Max(value, maxIntValue); res != "" {
+				results = append(results, res)
+			}
+			continue
+		}
+		if strings.HasPrefix("min:", rule) {
+			minStrValue := rule[4:]
+			minIntValue, err := strconv.Atoi(minStrValue)
+			if err != nil {
+				break
+			}
+			if res := r.Min(value, minIntValue); res != "" {
+				results = append(results, res)
+			}
+			continue
 		}
 	}
 
