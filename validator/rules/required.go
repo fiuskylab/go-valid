@@ -1,4 +1,4 @@
-package validator
+package rules
 
 const (
 	fieldRequired = `field required`
