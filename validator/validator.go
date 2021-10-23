@@ -1,11 +1,10 @@
 package validator
 
 import (
-	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 
+	"github.com/fiuskylab/go-valid/validator/rules"
 	r "github.com/fiuskylab/go-valid/validator/rules"
 )
 
@@ -13,7 +12,31 @@ type validator struct {
 	Result Result
 }
 
-func Check(i interface{}, rules map[string][]string) (Result, error) {
+type Rules map[string]Rule
+
+type Rule struct {
+	// Max:
+	// 		Lenght of strings, slices, etc.
+	// 		Size of number
+	Max int
+	// Min:
+	// 		Lenght of strings, slices, etc.
+	// 		Size of number
+	Min int
+	// Regex is the string of regular expression
+	Regex string
+	// Type rule
+	// compare the received value to the expected type
+	Type rules.Type
+	// TypeVar rule
+	// compare the received type of value from another type of value
+	TypeVar interface{}
+	// Required
+	// 		if the field must have a value
+	Required bool
+}
+
+func Check(i interface{}, rules Rules) (Result, error) {
 	typeOf := reflect.TypeOf(i)
 	valueOf := reflect.ValueOf(i)
 
@@ -37,43 +60,32 @@ const (
 	emptyRulesForField = `no rules found for %s`
 )
 
-func (v *validator) validateField(value interface{}, fieldName string, rules []string) error {
-	if len(rules) == 0 {
-		return fmt.Errorf(emptyRulesForField, fieldName)
-	}
-
+func (v *validator) validateField(value interface{}, fieldName string, rules Rule) error {
 	results := []string{}
 
 	var err error
 
-	for _, rule := range rules {
-		if rule == "required" {
-			if res := r.Required(value); res != "" {
-				results = append(results, res)
-			}
-			continue
+	if rules.Required {
+		if res := r.Required(value); res != "" {
+			results = append(results, res)
 		}
-		if strings.HasPrefix("max:", rule) {
-			maxStrValue := rule[4:]
-			maxIntValue, err := strconv.Atoi(maxStrValue)
-			if err != nil {
-				break
-			}
-			if res := r.Max(value, maxIntValue); res != "" {
-				results = append(results, res)
-			}
-			continue
+	}
+
+	if rules.Max != 0 {
+		if res := r.Max(value, rules.Max); res != "" {
+			results = append(results, res)
 		}
-		if strings.HasPrefix("min:", rule) {
-			minStrValue := rule[4:]
-			minIntValue, err := strconv.Atoi(minStrValue)
-			if err != nil {
-				break
-			}
-			if res := r.Min(value, minIntValue); res != "" {
-				results = append(results, res)
-			}
-			continue
+	}
+
+	if rules.Min != 0 {
+		if res := r.Min(value, rules.Min); res != "" {
+			results = append(results, res)
+		}
+	}
+
+	if rules.Regex != "" {
+		if res := r.Regex(value, rules.Regex); res != "" {
+			results = append(results, res)
 		}
 	}
 
