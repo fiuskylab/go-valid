@@ -89,6 +89,18 @@ func (v *validator) validateField(value interface{}, fieldName string, rules Rul
 		}
 	}
 
+	if !isNil(rules.Type) {
+		if res := r.IsType(value, rules.Type); res != "" {
+			results = append(results, res)
+		}
+	}
+
+	if !isNil(rules.TypeVar) {
+		if res := r.IsTypeVar(value, rules.TypeVar); res != "" {
+			results = append(results, res)
+		}
+	}
+
 	if len(results) > 0 {
 		v.Result[strings.ToLower(fieldName)] = results
 	}
