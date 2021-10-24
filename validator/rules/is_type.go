@@ -6,7 +6,8 @@ type Type int
 
 const (
 	// INT
-	Int Type = iota
+	Nil Type = iota
+	Int
 	Int64
 	Int32
 	Int16
