@@ -18,10 +18,22 @@ func TestCheck(t *testing.T) {
 		SliceStr: []string{"foo", "bar"},
 	}
 
-	rules := map[string][]string{
-		"string":   {"required", "min:2", "max:10"},
-		"int":      {"required", "min:2", "max:7"},
-		"slicestr": {"required", "min:3", "max:10"},
+	rules := Rules{
+		"string": Rule{
+			Required: true,
+			Min:      2,
+			Max:      10,
+		},
+		"int": Rule{
+			Required: true,
+			Min:      2,
+			Max:      7,
+		},
+		"slicestr": Rule{
+			Required: true,
+			Min:      3,
+			Max:      10,
+		},
 	}
 
 	{
@@ -29,7 +41,7 @@ func TestCheck(t *testing.T) {
 		got, gotErr := Check(ts, rules)
 
 		if !reflect.DeepEqual(want, got) {
-			t.Errorf(`want "%T", got "%T"`, want, got)
+			t.Errorf(`want "%s", got "%s"`, want, got)
 		}
 		if gotErr != nil {
 			t.Errorf(`Error must be nil, received %s`, gotErr.Error())

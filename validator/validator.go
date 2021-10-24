@@ -34,6 +34,10 @@ type Rule struct {
 	// Required
 	// 		if the field must have a value
 	Required bool
+
+	// In
+	// 		check if a value is inside of a slice of values
+	In []interface{}
 }
 
 func Check(i interface{}, rules Rules) (Result, error) {
@@ -89,7 +93,7 @@ func (v *validator) validateField(value interface{}, fieldName string, rules Rul
 		}
 	}
 
-	if !isNil(rules.Type) {
+	if rules.Type != r.Nil {
 		if res := r.IsType(value, rules.Type); res != "" {
 			results = append(results, res)
 		}
@@ -97,6 +101,12 @@ func (v *validator) validateField(value interface{}, fieldName string, rules Rul
 
 	if !isNil(rules.TypeVar) {
 		if res := r.IsTypeVar(value, rules.TypeVar); res != "" {
+			results = append(results, res)
+		}
+	}
+
+	if len(rules.In) > 0 {
+		if res := r.In(value, rules.In); res != "" {
 			results = append(results, res)
 		}
 	}
