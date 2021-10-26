@@ -4,56 +4,32 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/fiuskylab/go-valid/validator/rules"
 	r "github.com/fiuskylab/go-valid/validator/rules"
 )
 
 type validator struct {
 	Result Result
+	values map[string]interface{}
 }
 
-type Rules map[string]Rule
-
-type Rule struct {
-	// Max:
-	// 		Lenght of strings, slices, etc.
-	// 		Size of number
-	Max int
-	// Min:
-	// 		Lenght of strings, slices, etc.
-	// 		Size of number
-	Min int
-	// Regex is the string of regular expression
-	Regex string
-	// Type rule
-	// compare the received value to the expected type
-	Type rules.Type
-	// TypeVar rule
-	// compare the received type of value from another type of value
-	TypeVar interface{}
-	// Required
-	// 		if the field must have a value
-	Required bool
-
-	// In
-	// 		check if a value is inside of a slice of values
-	In []interface{}
-}
-
-func Check(i interface{}, rules Rules) (Result, error) {
+func Check(i interface{}, rules r.Rules) (Result, error) {
 	typeOf := reflect.TypeOf(i)
 	valueOf := reflect.ValueOf(i)
 
 	v := validator{
 		Result: make(Result),
+		values: make(map[string]interface{}),
 	}
 
 	var err error
-
 	for i := 0; i < typeOf.NumField(); i++ {
-		fieldName := typeOf.Field(i).Name
-		fieldNameLower := strings.ToLower(fieldName)
-		if err := v.validateField(valueOf.Field(i).Interface, fieldName, rules[fieldNameLower]); err != nil {
+		fieldNameLower := strings.ToLower(typeOf.Field(i).Name)
+		fieldValue := valueOf.Field(i).Interface()
+		v.values[fieldNameLower] = fieldValue
+	}
+
+	for key, val := range v.values {
+		if err = v.validateField(val, key, rules[key]); err != nil {
 			return v.Result, err
 		}
 	}
@@ -64,7 +40,7 @@ const (
 	emptyRulesForField = `no rules found for %s`
 )
 
-func (v *validator) validateField(value interface{}, fieldName string, rules Rule) error {
+func (v *validator) validateField(value interface{}, fieldName string, rules r.Rule) error {
 	results := []string{}
 
 	var err error
@@ -112,7 +88,7 @@ func (v *validator) validateField(value interface{}, fieldName string, rules Rul
 	}
 
 	if len(results) > 0 {
-		v.Result[strings.ToLower(fieldName)] = results
+		v.Result[fieldName] = results
 	}
 
 	return err
