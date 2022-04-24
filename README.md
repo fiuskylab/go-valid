@@ -13,6 +13,7 @@ type Foo struct {
   Field2 int
 }
 
+// Rule keys MUST be lowercase
 var fooRules map[string][]string = {
   "field1": [
     "required", 

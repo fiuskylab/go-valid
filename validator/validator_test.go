@@ -3,6 +3,8 @@ package validator
 import (
 	"reflect"
 	"testing"
+
+	"github.com/fiuskylab/go-valid/validator/rules"
 )
 
 type TestStruct struct {
@@ -18,20 +20,20 @@ func TestCheck(t *testing.T) {
 		SliceStr: []string{"foo", "bar"},
 	}
 
-	rules := Rules{
-		"string": Rule{
+	rules := rules.Rules{
+		"string": rules.Rule{
 			Required: true,
 			Min:      2,
 			Max:      10,
 		},
-		"int": Rule{
+		"int": rules.Rule{
 			Required: true,
 			Min:      2,
-			Max:      7,
+			Max:      13,
 		},
-		"slicestr": Rule{
+		"slicestr": rules.Rule{
 			Required: true,
-			Min:      3,
+			Min:      2,
 			Max:      10,
 		},
 	}

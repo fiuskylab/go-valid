@@ -41,12 +41,22 @@ const (
 )
 
 func (v *validator) validateField(value interface{}, fieldName string, rules r.Rule) error {
+	if strings.HasSuffix(fieldName, "_confirmation") {
+		return nil
+	}
+
 	results := []string{}
 
 	var err error
 
 	if rules.Required {
 		if res := r.Required(value); res != "" {
+			results = append(results, res)
+		}
+	}
+
+	if rules.Confirmed {
+		if res := r.Confirm(value, v.values[fieldName+"_confirmation"], fieldName); res != "" {
 			results = append(results, res)
 		}
 	}

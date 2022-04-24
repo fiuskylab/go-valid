@@ -2,6 +2,7 @@ package examples
 
 import (
 	"github.com/fiuskylab/go-valid/validator"
+	"github.com/fiuskylab/go-valid/validator/rules"
 )
 
 type User struct {
@@ -19,23 +20,23 @@ func main() {
 		PhoneNumber:          "",
 	}
 
-	rules := validator.Rules{
-		"username": validator.Rule{
+	rules := rules.Rules{
+		"username": rules.Rule{
 			Required: true,
 			Min:      4,
 			Max:      16,
 		},
-		"password": validator.Rule{
+		"password": rules.Rule{
 			Required: true,
 			Min:      8,
 			Max:      32,
 		},
-		"passwordconfirmation": validator.Rule{
+		"passwordconfirmation": rules.Rule{
 			Required: true,
 			Min:      8,
 			Max:      32,
 		},
-		"phonenumber": validator.Rule{
+		"phonenumber": rules.Rule{
 			Required: false, // Default
 			Regex:    `/some_regex/`,
 		},
