@@ -18,4 +18,10 @@ type (
 		Min *int
 		Max *int
 	}
+
+	// TODO:
+	// 		implement this $H!T
+	rulesTypeConstraint interface {
+		[]string | []rule
+	}
 )
