@@ -7,7 +7,7 @@ import (
 )
 
 func TestRequired(t *testing.T) {
-	t.Run("String", func(t *testing.T) {
+	t.Run("Number", func(t *testing.T) {
 		t.Run("Empty", func(t *testing.T) {
 			require := require.New(t)
 			value := 0
@@ -19,6 +19,24 @@ func TestRequired(t *testing.T) {
 		t.Run("Not Empty", func(t *testing.T) {
 			require := require.New(t)
 			value := 1
+
+			got := Required(value, "value")
+
+			require.Nil(got)
+		})
+	})
+	t.Run("String", func(t *testing.T) {
+		t.Run("Empty", func(t *testing.T) {
+			require := require.New(t)
+			value := ""
+
+			got := Required(value, "value")
+
+			require.NotNil(got)
+		})
+		t.Run("Not Empty", func(t *testing.T) {
+			require := require.New(t)
+			value := "foo"
 
 			got := Required(value, "value")
 
